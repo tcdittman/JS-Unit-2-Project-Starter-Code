@@ -1,13 +1,5 @@
-$(document).addClass('loader');
-
 
 $(document).ready(function () {
-
-  //hide loading page
-  $(document).removeClass('loader');
-  $(document).addClass('loader hidden');
-
-
 
 
 // Pull artilces source #1: FourFourTwo
@@ -23,14 +15,18 @@ $(document).ready(function () {
 var requestArticles = function(results, status){
    console.log(status);
    if (status !== "success") {
-     alert('Could not pull results from FourFourTwo');
+     alert('Could not pull results');
    } else {
      results.articles.forEach(function(result){
        var $newArticle = $('<article>').addClass('article');
 
        //section for the image
        var $newArticleImage = $('<section>').addClass('featuredImage');
-       var $theImage = $('<img>').attr('src', result.urlToImage).attr('alt', '');
+       if (result.urlToImage === null) {
+         var $theImage = $('<img>').attr('src', 'images/article_placeholder_1.jpg').attr('alt', '');
+       } else {
+         var $theImage = $('<img>').attr('src', result.urlToImage).attr('alt', '');
+       }
        $newArticleImage.append($theImage);
 
        //section for the content
@@ -52,11 +48,12 @@ var requestArticles = function(results, status){
        $newArticle.append($newArticleImage, $newArticleContent, $newArticleImpressions, $newArticleDiv);
 
        $('#main').append($newArticle);
+       $('#popUp').addClass('hidden');
      })
    }
  };
 
-// fetch all articles
+//Populate feed with articles from all 3 sources
  allUrls.forEach(function(sourceUrl) {
     $.get(sourceUrl + apiKeyAppend, requestArticles);
  });
@@ -68,32 +65,59 @@ var requestArticles = function(results, status){
 
 
 //Clicking on articles
-$('.articleContent').click('a', function() {
-  console.log("Clicked a title");
-
+$('#main').click('article', function() {
+  //clear any existing content
+  $('#popUp .container').empty();
+  console.log(this);
+  //populate popUp with desired content and display it
+  var thisArticleTitle = this;
+  $('#popUp .container').append('<h1>' + thisArticleTitle + '</h1>');
+  $('#popUp .container').append('<p>' + thisArticleTitle + '</p>');
+  var $linkButton = $('<a>Read more from source</a>').addClass('popUpAction').attr('href', 'http://www.google.com').attr('target', '_blank');
+  $('#popUp .container').append($linkButton);
 
   $('#popUp').removeClass('loader hidden');
 
+  //close the popUp
   $('.closePopUp').click(function(){
-    $('#popUp').addClass('loader hidden');
+    $('#popUp').addClass('hidden');
   });
 
 });
 
+
+  //Dropdown filter for each source
   $('#hacker').click(function() {
+    $('#popUp').removeClass('hidden');
     $('.article').remove();
     $.get(hackerNewsUrl + apiKeyAppend, requestArticles);
   });
 
   $('#nytimes').click(function() {
+    $('#popUp').removeClass('hidden');
     $('.article').remove();
     $.get(nytUrl + apiKeyAppend, requestArticles);
   });
 
   $('#fourfour').click(function() {
+    $('#popUp').removeClass('hidden');
     $('.article').remove();
     $.get(fourFourTwoUrl + apiKeyAppend, requestArticles);
   });
 
+  //Search button functionality
+  $('#search').click(function(){
+    $(this).toggleClass('active');
+  })
+
+  //Clicking the Feedr logo displays the default feed
+  $('#title').click(function(){
+    $('#popUp .container').empty();
+    $('#popUp').removeClass('hidden');
+    $('.article').remove();
+    allUrls.forEach(function(sourceUrl) {
+       $.get(sourceUrl + apiKeyAppend, requestArticles);
+    });
+  })
 
 });
