@@ -13,7 +13,6 @@ $(document).ready(function () {
 
 //generic request to fetch articles from a source and add to page
 var requestArticles = function(results, status){
-   console.log(status);
    if (status !== "success") {
      alert('Could not pull results');
    } else {
@@ -47,8 +46,27 @@ var requestArticles = function(results, status){
 
        $newArticle.append($newArticleImage, $newArticleContent, $newArticleImpressions, $newArticleDiv);
 
+
        $('#main').append($newArticle);
        $('#popUp').addClass('hidden');
+
+       //prepare the popUp content
+       //title for popUp
+       var $newPopUpTitle = $('<h1>'+result.title+'</h1>').addClass('hidden');
+
+       //description for popUp
+       if (result.description === null) {
+         var $newPopUpDescription = $('<p>').text("No description available :(").addClass('hidden');
+       } else {
+         var $newPopUpDescription = $('<p>'+result.description+'</p>').addClass('hidden');
+       }
+
+       //link for popUp
+       var articleUrl = result.url;
+       var $newPopUpLink = $('<a target="_blank">'+'Read more from source'+'</a>').attr('href', articleUrl).addClass('popUpAction hidden');
+
+       $('#popUp .container').append($newPopUpTitle, $newPopUpDescription, $newPopUpLink);
+
      })
    }
  };
@@ -67,15 +85,20 @@ var requestArticles = function(results, status){
 //Clicking on articles
 $('#main').click('article', function() {
   //clear any existing content
-  $('#popUp .container').empty();
-  console.log(this);
-  //populate popUp with desired content and display it
-  var thisArticleTitle = this;
-  $('#popUp .container').append('<h1>' + thisArticleTitle + '</h1>');
-  $('#popUp .container').append('<p>' + thisArticleTitle + '</p>');
-  var $linkButton = $('<a>Read more from source</a>').addClass('popUpAction').attr('href', 'http://www.google.com').attr('target', '_blank');
-  $('#popUp .container').append($linkButton);
+  $("#popUp .container").children().addClass('hidden');
+//  $("#popUp .container h1").addClass('hidden');
+  //$("#popUp .container p").addClass('hidden');
+  //$("#popUp .container a").addClass('hidden');
 
+  //identify the index of the h3 clicked
+  var articleIndex = $(event.target).index('h3');
+
+  //show that exact article
+  $("#popUp .container h1:nth-of-type(" + (articleIndex + 2) + ")").removeClass("hidden");
+  $("#popUp .container p:nth-of-type(" + (articleIndex + 2) + ")").removeClass("hidden");
+  $("#popUp .container a:nth-of-type(" + (articleIndex + 2) + ")").removeClass("hidden");
+
+  //reveal the populated popUp
   $('#popUp').removeClass('loader hidden');
 
   //close the popUp
