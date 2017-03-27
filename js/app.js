@@ -1,9 +1,7 @@
-
 $(document).ready(function () {
 
-
-// Pull artilces source #1: FourFourTwo
- var apiKeyAppend = "&apiKey=a2338a9170cc47568d71f04f33d03d6d";
+// Sources
+ var apiKeyAppend = "";
 
  var hackerNewsUrl = 'https://newsapi.org/v1/articles?source=hacker-news&sortBy=top';
  var nytUrl ='https://newsapi.org/v1/articles?source=the-new-york-times&sortBy=top';
@@ -17,6 +15,7 @@ var requestArticles = function(results, status){
      alert('Could not pull results');
    } else {
      results.articles.forEach(function(result){
+       //article element
        var $newArticle = $('<article>').addClass('article');
 
        //section for the image
@@ -34,7 +33,7 @@ var requestArticles = function(results, status){
        var $newArticleA = $('<a>').attr('href', articleHref);
        $newArticleA.append('<h3>'+result.title+'</h3>');
        $newArticleContent.append($newArticleA);
-       $newArticleContent.append('<h6>' + results.source + '</h6>');
+       $newArticleContent.append('<h6>' + results.source + '</h6>'); //using the source
 
        //section for the impressions
        var $newArticleImpressions = $('<section>').addClass('impressions');
@@ -44,9 +43,8 @@ var requestArticles = function(results, status){
        //div for clearfix
        var $newArticleDiv = $('<div>').addClass('clearfix');
 
+       //package up the article opbject, add it to the DOM, display it!
        $newArticle.append($newArticleImage, $newArticleContent, $newArticleImpressions, $newArticleDiv);
-
-
        $('#main').append($newArticle);
        $('#popUp').addClass('hidden');
 
@@ -65,8 +63,8 @@ var requestArticles = function(results, status){
        var articleUrl = result.url;
        var $newPopUpLink = $('<a target="_blank">'+'Read more from source'+'</a>').attr('href', articleUrl).addClass('popUpAction hidden');
 
+       //add the article's popUp content to a hidden element in the DOM
        $('#popUp .container').append($newPopUpTitle, $newPopUpDescription, $newPopUpLink);
-
      })
    }
  };
@@ -76,24 +74,16 @@ var requestArticles = function(results, status){
     $.get(sourceUrl + apiKeyAppend, requestArticles);
  });
 
-
-
-
-
-
-
 //Clicking on articles
 $('#main').click('article', function() {
+
   //clear any existing content
   $("#popUp .container").children().addClass('hidden');
-//  $("#popUp .container h1").addClass('hidden');
-  //$("#popUp .container p").addClass('hidden');
-  //$("#popUp .container a").addClass('hidden');
 
   //identify the index of the h3 clicked
   var articleIndex = $(event.target).index('h3');
 
-  //show that exact article
+  //reveal the content of just that article
   $("#popUp .container h1:nth-of-type(" + (articleIndex + 2) + ")").removeClass("hidden");
   $("#popUp .container p:nth-of-type(" + (articleIndex + 2) + ")").removeClass("hidden");
   $("#popUp .container a:nth-of-type(" + (articleIndex + 2) + ")").removeClass("hidden");
@@ -105,9 +95,7 @@ $('#main').click('article', function() {
   $('.closePopUp').click(function(){
     $('#popUp').addClass('hidden');
   });
-
 });
-
 
   //Dropdown filter for each source
   $('#hacker').click(function() {
@@ -142,5 +130,4 @@ $('#main').click('article', function() {
        $.get(sourceUrl + apiKeyAppend, requestArticles);
     });
   })
-
 });
